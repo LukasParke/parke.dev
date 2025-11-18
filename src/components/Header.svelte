@@ -1,0 +1,41 @@
+<script lang="ts">
+  // Skeleton
+  import { AppBar } from "@skeletonlabs/skeleton-svelte";
+  // Icons
+  import IconLogo from "@lucide/svelte/icons/rocket";
+  // Utils
+  import { SITE_TITLE } from "@src/consts";
+
+  // For best results limit to 3-5 options max
+  const navigation = [
+    { label: "Blog", href: "/" },
+    { label: "Posts", href: "/posts" },
+  ];
+</script>
+
+<header
+  class="sticky top-0 z-10 border-b border-surface-100-900 bg-surface-50-950/80 backdrop-blur-xl"
+>
+  <AppBar class="bg-transparent container mx-auto">
+    <AppBar.Toolbar class="grid-cols-[auto_1fr_auto] gap-10">
+      <AppBar.Lead>
+        <a
+          href="/"
+          class="btn-icon md:btn-icon-lg from-secondary-500 to-tertiary-500 rounded-full bg-linear-to-tr text-white"
+          title={SITE_TITLE}
+        >
+          <IconLogo />
+        </a>
+      </AppBar.Lead>
+      <AppBar.Headline>
+        <nav class="flex gap-2">
+          {#each navigation as route}
+            <a class="btn hover:preset-tonal-tertiary" href={route.href}>
+              {route.label}
+            </a>
+          {/each}
+        </nav>
+      </AppBar.Headline>
+    </AppBar.Toolbar>
+  </AppBar>
+</header>

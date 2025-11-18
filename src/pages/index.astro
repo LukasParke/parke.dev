@@ -1,0 +1,212 @@
+---
+import LayoutRoot from "@layouts/LayoutRoot.astro";
+
+import { getCollection } from "astro:content";
+import FormattedDate from "@components/FormattedDate.astro";
+import Scroller from "@components/Scroller.svelte";
+import LinkedIn from "@svg/linkedin.svg";
+import Bluesky from "@svg/bluesky.svg";
+import GitHub from "@svg/github.svg";
+import { socialLinks } from "@src/data/social-links";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const authors = (await getCollection("authors")).sort(
+  // Alphabetical by id
+  (a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
+);
+
+const iconMap = {
+  Bluesky,
+  GitHub,
+  LinkedIn,
+} as const;
+
+const socialLinksWithIcons = socialLinks.map((link) => ({
+  ...link,
+  Icon: iconMap[link.title],
+}));
+---
+
+<LayoutRoot title="" description="" author="" pubDate={new Date()}>
+  <div>
+    <!-- DEBUG -->
+    <!-- <pre class="pre">{JSON.stringify(posts, null, 2)}</pre> -->
+
+    <!-- Header -->
+    <header class="flex justify-center items-center px-4 py-5 md:py-10">
+      <!-- Responsive Title -->
+      <!-- NOTE: you may need to adjust the font-size based on the number of characters -->
+      <!-- https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text -->
+      <div
+        class="flex flex-col gap-6 text-4xl sm:text-6xl xl:text-8xl 2xl:text-9xl justify-center uppercase font-mono font-bold"
+      >
+        <p class="text-center">A Blog about</p>
+        <Scroller client:load />
+      </div>
+    </header>
+
+    <hr class="hr container mx-auto" />
+
+    <!-- Featured -->
+    <section class="p-4 md:py-10">
+      <div class="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- The Top Post -->
+        <a
+          class="card border border-surface-100-900 hover:preset-tonal overflow-hidden"
+          href={`/blog/${posts[0].id}/`}
+        >
+          {
+            posts[0].data.heroImage && (
+              <img
+                class="w-full aspect-video rounded-container"
+                src={posts[0].data.heroImage}
+                alt="Portfolio"
+              />
+            )
+          }
+          <article class="p-4 space-y-4">
+            <time class="text-xs opacity-75">
+              <FormattedDate date={posts[0].data.pubDate} />
+            </time>
+            <h2 class="h2">{posts[0].data.title}</h2>
+            <p class="opacity-75">{posts[0].data.description}</p>
+          </article>
+        </a>
+        <!-- Additional Featured Posts -->
+        <div class="grid grid-cols-1 gap-4 place-content-start">
+          <!-- Loop Posts 2-4 -->
+          {
+            posts.slice(1, 4).map((post) => (
+              <a
+                class="card border border-surface-100-900 hover:preset-tonal overflow-hidden"
+                href={`/blog/${post.id}/`}
+              >
+                <article
+                  class={`grid grid-cols-1 ${post.data.heroImage ? "sm:grid-cols-[280px_1fr]" : undefined}`}
+                >
+                  {post.data.heroImage && (
+                    <img
+                      class="w-full aspect-video"
+                      src={post.data.heroImage}
+                      alt="Portfolio"
+                    />
+                  )}
+                  <div class="space-y-2 p-4">
+                    <time class="text-xs opacity-75">
+                      <FormattedDate date={post.data.pubDate} />
+                    </time>
+                    <h2 class="h2">{post.data.title}</h2>
+                    <p class="opacity-75">{posts[0].data.description}</p>
+                  </div>
+                </article>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Latest -->
+    <section class="preset-filled-surface-950-50 p-5 md:p-10">
+      <div class="container mx-auto space-y-4 md:space-y-10">
+        <h2 class="h3">Latest Posts</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {
+            posts.slice(1, 5).map((post) => (
+              <a
+                class="card border border-surface-900-100 hover:bg-surface-900-100 overflow-hidden"
+                href={`/blog/${post.id}/`}
+              >
+                {post.data.heroImage && (
+                  <img
+                    class="w-full aspect-video"
+                    src={post.data.heroImage}
+                    alt="Portfolio"
+                  />
+                )}
+                <article class="p-4 space-y-2">
+                  <time class="block text-base">
+                    <FormattedDate date={post.data.pubDate} />
+                  </time>
+                  <h3 class="h3">{post.data.title}</h3>
+                  <p class="opacity-75">{posts[0].data.description}</p>
+                </article>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Authors / Categories -->
+    <section class="preset-filled-primary-500 p-5 md:p-10">
+      <div class="container mx-auto">
+        <div
+          class="grid grid-cols-1 lg:grid-cols-[1fr_2fr] items-center gap-10 lg:gap-20"
+        >
+          <!-- Categories -->
+          <div class="space-y-4">
+            <h2 class="h2">Who am I?</h2>
+            <p class="">
+              Hi, I'm Luke Parke
+              <br />
+              I am a husband and father, a native Austinite, and a software engineer.
+              <br />
+              <br />
+              And a few other things too:
+              <ul class="list-inside list-disc space-y-2">
+                <li>A lover of Svelte and SvelteKit</li>
+                <li>A fan of OpenAPI</li>
+                <li>A user of Dokploy</li>
+                <li>And a massive nerd</li>
+              </ul>
+              <br />
+              <p>Feel free to follow me on your platform of choice:</p>
+              <div class="flex items-center gap-2 divide-x divide-black">
+                {
+                  socialLinksWithIcons.map(({ Icon, ...link }) => (
+                    <a
+                      class="flex items-center gap-2 px-2"
+                      href={link.url}
+                      target={link.target}
+                      rel="noreferrer"
+                    >
+                      {Icon && <Icon class="size-6 fill-white" />}
+                      {link.title}
+                    </a>
+                  ))
+                }
+              </div>
+            </p>
+          </div>
+          <!-- Authors -->
+          <div class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
+              {
+                authors.map((author) => (
+                  <a
+                    class="text-center space-y-2"
+                    href={author.data.website}
+                    target="_blank"
+                  >
+                    <img
+                      class="w-full rounded-full mx-auto overflow-hidden"
+                      src={author.data.portrait}
+                      alt={author.data.id}
+                    />
+                    <div>
+                      <h4 class="h2 md:h3">{author.data.name}</h4>
+                      <p class="opacity-75">{author.data.title}</p>
+                    </div>
+                  </a>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</LayoutRoot>

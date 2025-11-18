@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@plugin '@tailwindcss/forms';
+
+@import "@skeletonlabs/skeleton";
+@import "@skeletonlabs/skeleton/themes/cerberus";
+
+@import '@skeletonlabs/skeleton-svelte';
+
+/* Theme Overrides --- */
+
+[data-theme="cerberus"] {
+  --text-scaling: 1;
+  --radius-base: 0.25rem;
+  --radius-container: 0.25rem;
+  --color-surface-950: oklch(0% 0 none);
+}

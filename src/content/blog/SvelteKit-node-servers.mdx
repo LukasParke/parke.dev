@@ -1,0 +1,48 @@
+---
+title: "Easier deployment of SvelteKit node servers with docker"
+description: "How to deploy SvelteKit node servers with docker"
+topic: "Development"
+tags: ["SvelteKit", "Svelte", "Docker", "Node.js"]
+author: "luke-parke"
+pubDate: "Nov 14 2025"
+---
+
+export const components = componentSet;
+
+When you are NOT deploying to a nice and simple platform like Vercel, you may be doing things a little more manually.
+
+For SvelteKit that is often really easy, tooling like nixpacks allows for a pretty much seamless deployment of most any application anywhere.
+
+I was working on a simple little test app to explore the functionality of how Coolify and SvelteKit both handles subdomains and I was getting a node version mismatch error due to a dep requiring one of a few specific node versions.
+
+Due to this I had to go the route of deploying with Docker instead, so here is a bare minimum Dockerfile for SvelteKit should anyone need one in the future.
+
+```dockerfile
+# ---- Build stage ----
+FROM node:24-alpine AS build
+
+WORKDIR /app
+
+# Install dependencies (cache-friendly)
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Copy source and build
+COPY . .
+RUN npm run build
+
+# ---- Run stage ----
+FROM node:24-alpine AS run
+
+WORKDIR /app
+
+# Copy the built app
+COPY --from=build /app/package.json ./
+COPY --from=build /app/build ./build
+
+EXPOSE 3000
+
+CMD ["node", "build"]
+```
+
+Cheers
