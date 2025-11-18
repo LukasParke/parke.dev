@@ -41,7 +41,7 @@ const posts = (await getCollection("blog")).sort(
       {
         posts.map((post) => (
           <a
-            href={`/blog/${post.id}/`}
+            href={`/posts/${post.id}/`}
             class="card border border-surface-100-900 hover:preset-tonal overflow-hidden"
           >
             {post.data.heroImage && (

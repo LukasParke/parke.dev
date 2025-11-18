@@ -14,7 +14,7 @@ import expressiveCode from "astro-expressive-code";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://example.com",
+  site: "https://blog.parke.dev",
   integrations: [
     // https://docs.astro.build/en/guides/integrations-guide/sitemap/
     sitemap(),
