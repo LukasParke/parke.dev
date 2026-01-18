@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+
+# Build outputs (we build inside the container)
+dist/
+.astro/
+.output/
+build/
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Git
+.git/
+.gitignore
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Docker files (no need to copy these into the image)
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# GitHub
+.github/
+
+# Documentation
+README.md
+*.md
+!src/**/*.md
+!src/**/*.mdx
+
+# Cache directories
+.cache/
+.turbo/
+.bun/
+
+# Testing
+coverage/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+.tmp/
+.temp/
