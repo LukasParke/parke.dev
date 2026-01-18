@@ -55,6 +55,12 @@ jobs:
             # Tag with short SHA for unique identification
             type=sha,prefix=sha-
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          driver: docker-container
+          install: true
+
       - name: Install Railpack
         run: |
           # Download latest Railpack release for Linux x86_64
@@ -65,6 +71,11 @@ jobs:
           chmod +x railpack
           sudo mv railpack /usr/local/bin/
           railpack --version
+
+      - name: Start BuildKit daemon
+        run: |
+          docker run --rm --privileged -d --name buildkit moby/buildkit
+          echo "BUILDKIT_HOST=docker-container://buildkit" >> $GITHUB_ENV
 
       - name: Build with Railpack
         id: railpack
