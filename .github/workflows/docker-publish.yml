@@ -4,116 +4,27 @@ on:
   push:
     branches:
       - main
-    tags:
-      - 'v*'
-  pull_request:
-    branches:
-      - main
-
-env:
-  REGISTRY: ghcr.io
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read
       packages: write
-      attestations: write
-      id-token: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set lowercase image name
-        run: echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
-
-      - name: Log in to Container Registry
-        if: github.event_name != 'pull_request'
+      - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
+          registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
+      - name: Build and push Docker images
+        uses: iloveitaly/github-action-railpack@master
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: |
-            # Set latest tag for default branch
-            type=raw,value=latest,enable={{is_default_branch}}
-            # Tag with branch name
-            type=ref,event=branch
-            # Tag with PR number
-            type=ref,event=pr
-            # Tag with git tag (v1.0.0 -> 1.0.0)
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            # Tag with short SHA for unique identification
-            type=sha,prefix=sha-
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver: docker-container
-          install: true
-
-      - name: Install Railpack
-        run: |
-          # Download latest Railpack release for Linux x86_64
-          RAILPACK_VERSION=$(curl -s https://api.github.com/repos/railwayapp/railpack/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-          echo "Installing Railpack ${RAILPACK_VERSION}"
-          curl -sSL "https://github.com/railwayapp/railpack/releases/download/${RAILPACK_VERSION}/railpack-${RAILPACK_VERSION}-x86_64-unknown-linux-musl.tar.gz" -o railpack.tar.gz
-          tar -xzf railpack.tar.gz
-          chmod +x railpack
-          sudo mv railpack /usr/local/bin/
-          railpack --version
-
-      - name: Start BuildKit daemon
-        run: |
-          docker run --rm --privileged -d --name buildkit moby/buildkit
-          echo "BUILDKIT_HOST=docker-container://buildkit" >> $GITHUB_ENV
-
-      - name: Build with Railpack
-        id: railpack
-        run: |
-          # Build the image using Railpack (auto-detects Astro)
-          railpack build \
-            --name ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:build \
-            .
-          
-          # Get the image digest
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:build 2>/dev/null || echo "")
-          echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
-
-      - name: Tag and push image
-        if: github.event_name != 'pull_request'
-        env:
-          TAGS: ${{ steps.meta.outputs.tags }}
-        run: |
-          # Tag with all metadata tags and push
-          while IFS= read -r tag; do
-            [ -z "$tag" ] && continue
-            docker tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:build "$tag"
-            docker push "$tag"
-          done <<< "$TAGS"
-
-      - name: Get pushed image digest
-        if: github.event_name != 'pull_request'
-        id: push
-        run: |
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest | cut -d'@' -f2)
-          echo "digest=${DIGEST}" >> $GITHUB_OUTPUT
-
-      - name: Generate artifact attestation
-        if: github.event_name != 'pull_request'
-        uses: actions/attest-build-provenance@v2
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+          push: true
