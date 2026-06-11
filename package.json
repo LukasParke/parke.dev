@@ -13,6 +13,10 @@
     "astro": "bun run --cwd apps/blog astro",
     "dev:blog": "bun run --cwd apps/blog dev",
     "build:blog": "bun run --cwd apps/blog build",
-    "preview:blog": "bun run --cwd apps/blog preview"
+    "preview:blog": "bun run --cwd apps/blog preview",
+    "start": "npx serve -l 3000 apps/blog/dist"
+  },
+  "dependencies": {
+    "serve": "^14.2.4"
   }
 }
