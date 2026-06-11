@@ -28,8 +28,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker images
+      - name: Build and push blog Docker image
         uses: iloveitaly/github-action-railpack@master
         with:
           push: true
-          image: ghcr.io/${{ steps.repo.outputs.name }}
+          tags: |
+            ghcr.io/${{ steps.repo.outputs.name }}:latest
+            ghcr.io/${{ steps.repo.outputs.name }}:run-${{ github.run_number }}
+          env: |
+            RAILPACK_SPA_OUTPUT_DIR=apps/blog/dist

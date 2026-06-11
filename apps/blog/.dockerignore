@@ -1,7 +1,7 @@
 # Dependencies
 node_modules/
 
-# Build outputs (we build inside the container)
+# Build outputs
 dist/
 .astro/
 .output/
@@ -13,29 +13,17 @@ build/
 .env.production
 .env.*.local
 
-# Git
-.git/
-.gitignore
-
 # IDE/Editor
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Docker files (no need to copy these into the image)
-Dockerfile
-.dockerignore
-docker-compose*.yml
-
-# GitHub
-.github/
-
 # Documentation
 README.md
 *.md
-!apps/*/src/**/*.md
-!apps/*/src/**/*.mdx
+!src/**/*.md
+!src/**/*.mdx
 
 # Cache directories
 .cache/
