@@ -1,0 +1,81 @@
+/* Fonts */
+@import '@fontsource/inter';
+@import '@fontsource/space-grotesk';
+@import '@fontsource/jetbrains-mono';
+
+/* Tailwind + Skeleton */
+@import 'tailwindcss';
+@import '@skeletonlabs/skeleton';
+
+/* The parke theme (registered via data-theme="parke" in app.html) */
+@import './lib/theme/parke.css';
+
+/* Make Tailwind aware of Skeleton Svelte component classes */
+@source '../node_modules/@skeletonlabs/skeleton-svelte/dist';
+
+/* Dark mode only — this site lives its life in dark mode. */
+html {
+	color-scheme: dark;
+}
+
+/* Brand extras --------------------------------------------------------- */
+:root {
+	--font-mono-brand: 'JetBrains Mono', ui-monospace, monospace;
+	--glow-gold: 0 0 12px rgba(255, 197, 61, 0.35);
+	--glow-blue: 0 0 16px rgba(61, 139, 255, 0.3);
+}
+
+/* Subtle dot-grid texture on the void */
+body {
+	background-image: radial-gradient(rgba(61, 139, 255, 0.04) 1px, transparent 1px);
+	background-size: 24px 24px;
+}
+
+.font-mono-brand {
+	font-family: var(--font-mono-brand);
+}
+
+.glow-gold {
+	box-shadow: var(--glow-gold);
+}
+
+.glow-blue {
+	box-shadow: var(--glow-blue);
+}
+
+/* Blinking gold cursor for the prompt motif */
+.cursor-blink {
+	display: inline-block;
+	width: 0.55em;
+	height: 1.1em;
+	vertical-align: -0.15em;
+	background: var(--color-secondary-400);
+	box-shadow: var(--glow-gold);
+	animation: blink 1.1s steps(1) infinite;
+}
+
+@keyframes blink {
+	50% {
+		opacity: 0;
+	}
+}
+
+/* LED status dots */
+.led {
+	display: inline-block;
+	width: 0.5rem;
+	height: 0.5rem;
+	border-radius: 9999px;
+}
+.led-online {
+	background: var(--color-tertiary-400);
+	box-shadow: 0 0 10px color-mix(in oklab, var(--color-tertiary-400) 40%, transparent);
+}
+.led-gold {
+	background: var(--color-secondary-400);
+	box-shadow: var(--glow-gold);
+}
+.led-error {
+	background: var(--color-error-400);
+	box-shadow: 0 0 10px color-mix(in oklab, var(--color-error-400) 40%, transparent);
+}

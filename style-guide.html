@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>parke.dev — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --void:#060A13; --panel:#0B1220; --raised:#121C30; --overlay:#182441;
+  --line:#223153; --line-bright:#31497B;
+  --blue-300:#8FBCFF; --blue-400:#5EA1FF; --blue-500:#3D8BFF; --blue-600:#2566D8; --blue-900:#0E2A5C;
+  --gold-300:#FFD97A; --gold-400:#FFC53D; --gold-500:#E6A817; --gold-600:#B98208;
+  --online:#3DDC97; --error:#FF6B6B;
+  --text:#E6EDF8; --dim:#94A3B8; --muted:#5B6B85;
+  --glow-gold:0 0 12px rgba(255,197,61,.35); --glow-blue:0 0 16px rgba(61,139,255,.3);
+  --display:'Space Grotesk',sans-serif; --body:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*{margin:0;box-sizing:border-box}
+body{background:var(--void);color:var(--text);font-family:var(--body);line-height:1.6;
+  background-image:radial-gradient(rgba(61,139,255,.04) 1px, transparent 1px);background-size:24px 24px}
+.wrap{max-width:1000px;margin:0 auto;padding:48px 24px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.eyebrow .led{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--gold-400);box-shadow:var(--glow-gold);margin-right:8px;vertical-align:1px}
+h1{font-family:var(--display);font-size:clamp(36px,6vw,56px);font-weight:700;letter-spacing:-.02em;line-height:1.1;margin:12px 0 8px}
+h1 .gold{color:var(--gold-400)}
+h2{font-family:var(--display);font-size:24px;font-weight:500;margin:64px 0 20px;padding-top:24px;border-top:1px solid var(--line)}
+.sub{color:var(--dim);max-width:60ch}
+.prompt{font-family:var(--mono);font-size:15px;color:var(--dim);margin-top:24px}
+.prompt .host{color:var(--blue-400)}
+.prompt .cursor{display:inline-block;width:9px;height:18px;background:var(--gold-400);box-shadow:var(--glow-gold);vertical-align:-3px;animation:blink 1.1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.grid{display:grid;gap:12px}
+.swatches{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.swatch{border-radius:10px;border:1px solid var(--line);overflow:hidden;cursor:pointer;transition:transform .15s, box-shadow .15s;background:var(--panel)}
+.swatch:hover{transform:translateY(-2px);box-shadow:var(--glow-blue)}
+.swatch .chip{height:64px}
+.swatch .meta{padding:10px 12px;font-family:var(--mono);font-size:11px}
+.swatch .meta b{display:block;color:var(--text);font-weight:600}
+.swatch .meta span{color:var(--muted)}
+.cards{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px;transition:border-color .15s}
+.card:hover{border-color:var(--line-bright)}
+.card h3{font-family:var(--display);font-size:18px;margin:0 0 6px}
+.card p{color:var(--dim);font-size:14px}
+.status{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;margin-bottom:14px}
+.dot{width:8px;height:8px;border-radius:50%}
+.dot.g{background:var(--online);box-shadow:0 0 10px rgba(61,220,151,.4)}
+.dot.a{background:var(--gold-400);box-shadow:var(--glow-gold)}
+.dot.r{background:var(--error);box-shadow:0 0 10px rgba(255,107,107,.4)}
+.btns{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{font-family:var(--body);font-weight:600;font-size:14px;padding:10px 20px;border-radius:10px;border:1px solid transparent;cursor:pointer;transition:all .15s}
+.btn-primary{background:var(--blue-500);color:#fff}
+.btn-primary:hover{background:var(--blue-400);box-shadow:var(--glow-blue)}
+.btn-gold{background:var(--gold-400);color:var(--void)}
+.btn-gold:hover{background:var(--gold-300);box-shadow:var(--glow-gold)}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--line-bright);background:var(--raised)}
+a.link{color:var(--blue-400);text-decoration:none;border-bottom:1px solid transparent}
+a.link:hover{border-bottom-color:var(--gold-400)}
+.badge{font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:999px}
+.badge.b{background:var(--blue-900);color:var(--blue-300);border:1px solid var(--blue-600)}
+.badge.g{background:rgba(255,197,61,.12);color:var(--gold-300);border:1px solid var(--gold-600)}
+.type-row{display:flex;flex-wrap:wrap;gap:24px;align-items:baseline;border-bottom:1px solid var(--line);padding:14px 0}
+.type-row .label{font-family:var(--mono);font-size:11px;color:var(--muted);width:140px;flex-shrink:0}
+.term{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;font-family:var(--mono);font-size:13px}
+.term .bar{display:flex;gap:6px;padding:12px 16px;border-bottom:1px solid var(--line);background:var(--raised)}
+.term .bar i{width:10px;height:10px;border-radius:50%;background:var(--line-bright)}
+.term .bar i:first-child{background:var(--gold-400)}
+.term pre{padding:20px;overflow-x:auto;color:var(--dim);line-height:1.8}
+.term .c-b{color:var(--blue-400)} .term .c-g{color:var(--gold-400)} .term .c-gr{color:var(--online)} .term .c-t{color:var(--text)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--overlay);border:1px solid var(--gold-600);color:var(--gold-300);font-family:var(--mono);font-size:13px;padding:10px 20px;border-radius:10px;box-shadow:var(--glow-gold);transition:transform .25s;pointer-events:none}
+.toast.show{transform:translateX(-50%) translateY(0)}
+footer{margin-top:80px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted);font-family:var(--mono);font-size:12px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow"><span class="led"></span>SYSTEM ONLINE — PARKE.DEV DESIGN SYSTEM v1.0</div>
+  <h1>Server Room<br>at <span class="gold">Night</span>.</h1>
+  <p class="sub">Dark-mode-first design system for Luke Parke. Blue is the data moving through the rack; gold is the LED that says everything's running.</p>
+  <div class="prompt"><span class="host">luke@parke</span>:~$ mv lukehagar.com parke.dev <span class="cursor"></span></div>
+
+  <h2>Palette <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">// click any swatch to copy hex</span></h2>
+  <div class="grid swatches" id="swatches"></div>
+
+  <h2>Typography</h2>
+  <div class="type-row"><span class="label">display / Space Grotesk</span><span style="font-family:var(--display);font-size:32px;font-weight:700">Specs, SDKs, and servers.</span></div>
+  <div class="type-row"><span class="label">body / Inter</span><span style="font-size:16px;color:var(--dim)">I build the boring-but-critical plumbing of the developer world, and run it on hardware in my closet.</span></div>
+  <div class="type-row"><span class="label">mono / JetBrains Mono</span><span style="font-family:var(--mono);font-size:14px">~/homelab/compose.yaml · v2.4.1 · <span style="color:var(--gold-400)">austin.tx</span></span></div>
+
+  <h2>Buttons &amp; badges</h2>
+  <div class="btns">
+    <button class="btn btn-primary">Deploy</button>
+    <button class="btn btn-gold">Star on GitHub</button>
+    <button class="btn btn-ghost">View Docs</button>
+    <a class="link" href="#">uplink to parke.dev →</a>
+    <span class="badge b">openapi</span>
+    <span class="badge g">self-hosted</span>
+  </div>
+
+  <h2>Cards — homelab status</h2>
+  <div class="grid cards">
+    <div class="card"><div class="status"><span class="dot g"></span>ONLINE · 247d uptime</div><h3>plex-api-spec</h3><p>Community OpenAPI spec for Plex Media Server. SDKs in 9 languages.</p></div>
+    <div class="card"><div class="status"><span class="dot a"></span>BUILDING · pipeline #112</div><h3>OpenAPI.gg</h3><p>A visual OpenAPI design studio. Svelte 5 + Tailwind 4.</p></div>
+    <div class="card"><div class="status"><span class="dot r"></span>DEGRADED · probably the closet</div><h3>rack-03.parke.lan</h3><p>The NAS is fine. The NAS is always fine. It's the switch.</p></div>
+  </div>
+
+  <h2>Terminal block</h2>
+  <div class="term">
+    <div class="bar"><i></i><i></i><i></i></div>
+    <pre><span class="c-b">luke@parke</span>:~$ <span class="c-t">whoami</span>
+<span class="c-t">Software engineer. Identity &amp; DevEx. Austin, TX.</span>
+<span class="c-b">luke@parke</span>:~$ <span class="c-t">ls ~/projects</span>
+<span class="c-g">openapi/</span>  <span class="c-g">plex-sdks/</span>  <span class="c-g">sveltekit/</span>  <span class="c-g">homelab/</span>
+<span class="c-b">luke@parke</span>:~$ <span class="c-t">systemctl status brand.service</span>
+<span class="c-gr">● active (running)</span> — blue + gold, dark mode, since 2026</pre>
+  </div>
+
+  <footer><span>© 2026 Luke Parke · formerly Luke Hagar</span><span>parke<span style="color:var(--gold-400)">.dev</span></span></footer>
+</div>
+
+<div class="toast" id="toast">copied</div>
+<script>
+const colors=[
+ ["void","#060A13"],["panel","#0B1220"],["raised","#121C30"],["overlay","#182441"],["line","#223153"],
+ ["blue-300","#8FBCFF"],["blue-400","#5EA1FF"],["blue-500","#3D8BFF"],["blue-600","#2566D8"],["blue-900","#0E2A5C"],
+ ["gold-300","#FFD97A"],["gold-400","#FFC53D"],["gold-500","#E6A817"],["gold-600","#B98208"],
+ ["online","#3DDC97"],["error","#FF6B6B"],["text","#E6EDF8"],["text-dim","#94A3B8"],["text-muted","#5B6B85"]
+];
+const grid=document.getElementById('swatches'), toast=document.getElementById('toast');
+colors.forEach(([n,h])=>{
+  const d=document.createElement('div');d.className='swatch';
+  d.innerHTML=`<div class="chip" style="background:${h}"></div><div class="meta"><b>${n}</b><span>${h}</span></div>`;
+  d.onclick=()=>{navigator.clipboard.writeText(h);toast.textContent=`copied ${h}`;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1200)};
+  grid.appendChild(d);
+});
+</script>
+</body>
+</html>
