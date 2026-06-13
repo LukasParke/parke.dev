@@ -7,6 +7,7 @@ This repository is organized as a Bun workspace monorepo for multiple websites.
 | App | Path | Description |
 | --- | --- | --- |
 | `@parke/blog` | `apps/blog` | Existing Astro blog at `https://blog.parke.dev` |
+| `parke-dev` | `apps/portfolio` | SvelteKit portfolio site at `https://parke.dev` |
 
 ## Project Structure
 
@@ -15,6 +16,10 @@ apps/
   blog/
     astro.config.mjs
     public/
+    src/
+    package.json
+  portfolio/
+    svelte.config.js
     src/
     package.json
 package.json
@@ -36,12 +41,17 @@ Run commands from the repository root:
 | `bun run dev:blog` | Start only `apps/blog` |
 | `bun run build:blog` | Build only `apps/blog` |
 | `bun run preview:blog` | Preview only `apps/blog` |
+| `bun run dev:portfolio` | Start only `apps/portfolio` |
+| `bun run build:portfolio` | Build only `apps/portfolio` |
+| `bun run preview:portfolio` | Preview only `apps/portfolio` |
 
 You can also run commands directly inside a workspace:
 
 ```sh
 bun run --cwd apps/blog dev
 bun run --cwd apps/blog build
+bun run --cwd apps/portfolio dev
+bun run --cwd apps/portfolio build
 ```
 
 ## Adding Another Website
@@ -69,10 +79,12 @@ Deployment and infrastructure are managed in the separate [`home-ops`](https://g
 
 ### Publishing
 
-The GitHub Actions workflow (`.github/workflows/docker-publish.yml`) builds the blog on every push to `main` and pushes two tags to GHCR:
+The GitHub Actions workflow (`.github/workflows/docker-publish.yml`) builds the blog and portfolio on every push to `main` and pushes versioned tags to GHCR:
 
-- `ghcr.io/lukasparke/parke.dev:latest`
-- `ghcr.io/lukasparke/parke.dev:run-N` (immutable build number)
+- Blog: `ghcr.io/lukasparke/parke.dev:latest`
+- Blog: `ghcr.io/lukasparke/parke.dev:run-N` (immutable build number)
+- Portfolio: `ghcr.io/lukasparke/parke.dev-portfolio:latest`
+- Portfolio: `ghcr.io/lukasparke/parke.dev-portfolio:run-N` (immutable build number)
 
 The `run-N` tags are used by the home-ops cluster for deterministic rollouts and auto-updates.
 
