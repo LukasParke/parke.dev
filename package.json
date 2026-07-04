@@ -14,6 +14,9 @@
     "dev:blog": "bun run --cwd apps/blog dev",
     "build:blog": "bun run --cwd apps/blog build",
     "preview:blog": "bun run --cwd apps/blog preview",
+    "dev:portfolio": "bun run --cwd apps/portfolio dev",
+    "build:portfolio": "bun run --cwd apps/portfolio build",
+    "preview:portfolio": "bun run --cwd apps/portfolio preview",
     "start": "npx serve -l 3000 apps/blog/dist"
   },
   "dependencies": {

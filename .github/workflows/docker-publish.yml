@@ -37,3 +37,13 @@ jobs:
           tags: |
             ghcr.io/${{ steps.repo.outputs.name }}:latest
             ghcr.io/${{ steps.repo.outputs.name }}:run-${{ github.run_number }}
+
+      - name: Build and push portfolio Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/portfolio/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ steps.repo.outputs.name }}:portfolio-latest
+            ghcr.io/${{ steps.repo.outputs.name }}:portfolio-run-${{ github.run_number }}
