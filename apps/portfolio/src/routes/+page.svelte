@@ -3,7 +3,7 @@
 	import ProjectCard from '$lib/components/ProjectCard.svelte';
 	import { profile, projects } from '$lib/data/profile';
 
-	const categories = ['All', 'OpenAPI', 'Plex', 'Svelte', 'GitHub'] as const;
+	const categories = ['All', 'Homelab', 'OpenAPI', 'Plex', 'Svelte', 'GitHub'] as const;
 	let active = $state<(typeof categories)[number]>('All');
 
 	const filtered = $derived(
@@ -65,8 +65,11 @@
 				about API design at <a href={profile.links.blog}>openapiguy.dev</a>.
 			</p>
 			<p class="text-surface-300">
-				At home I run a rack of servers — everything on this site is self-hosted with Coolify,
-				deployed from a closet in Austin.
+				At home I run a rack of servers — everything on this site is self-hosted on a Talos
+				Kubernetes cluster declared in
+				<a href="https://github.com/LukasParke/home-ops">home-ops</a> and deployed by Flux straight
+				from <a href="https://github.com/LukasParke/parke.dev">parke.dev</a>, out of a closet in
+				Austin.
 			</p>
 		</div>
 		<div class="card preset-outlined-surface-700-300 bg-surface-900 p-6 space-y-4 self-start">
