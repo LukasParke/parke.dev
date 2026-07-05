@@ -16,9 +16,12 @@ npm run build
 node build
 ```
 
-## Deploy (Coolify / Docker)
+## Deploy (GitOps)
 
-Point Coolify at this repo with the included `Dockerfile`, or:
+CI builds the included `Dockerfile` on every push to main and publishes
+`ghcr.io/lukasparke/parke.dev-portfolio:run-N`; Flux image automation in
+[home-ops](https://github.com/LukasParke/home-ops) picks up the new tag and
+rolls it out to the cluster at https://parke.dev. To run it locally:
 
 ```sh
 docker build -t parke-dev .

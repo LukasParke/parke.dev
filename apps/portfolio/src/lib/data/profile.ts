@@ -12,7 +12,7 @@ export const profile = {
 		blog: 'https://openapiguy.dev',
 		bluesky: 'https://bsky.app/profile/lukehagar.com'
 	},
-	stack: ['Svelte', 'TypeScript', 'Go', 'Tailwind', 'OpenAPI', 'Docker', 'Coolify', 'Proxmox']
+	stack: ['Svelte', 'TypeScript', 'Go', 'Tailwind', 'OpenAPI', 'Docker', 'Kubernetes', 'Talos', 'Flux', 'Proxmox']
 };
 
 export type Status = 'online' | 'building' | 'archived';
@@ -23,10 +23,28 @@ export interface Project {
 	url: string;
 	tags: string[];
 	status: Status;
-	category: 'OpenAPI' | 'Plex' | 'Svelte' | 'GitHub';
+	category: 'OpenAPI' | 'Plex' | 'Svelte' | 'GitHub' | 'Homelab';
 }
 
 export const projects: Project[] = [
+	{
+		name: 'home-ops',
+		description:
+			'GitOps homelab: a Talos Kubernetes cluster fully declared in git and reconciled by Flux — networking, storage, observability, and every app on this site.',
+		url: 'https://github.com/LukasParke/home-ops',
+		tags: ['kubernetes', 'talos', 'flux'],
+		status: 'online',
+		category: 'Homelab'
+	},
+	{
+		name: 'parke.dev',
+		description:
+			'This site and the blog — a Bun monorepo built into OCI images by CI and rolled out to the cluster automatically by Flux image automation.',
+		url: 'https://github.com/LukasParke/parke.dev',
+		tags: ['svelte', 'astro', 'gitops'],
+		status: 'online',
+		category: 'Homelab'
+	},
 	{
 		name: 'plex-api-spec',
 		description: 'A community-maintained OpenAPI specification for Plex Media Server.',
