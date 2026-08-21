@@ -3,7 +3,18 @@
 	import ProjectCard from '$lib/components/ProjectCard.svelte';
 	import { profile, projects } from '$lib/data/profile';
 
-	const categories = ['All', 'Homelab', 'OpenAPI', 'Plex', 'Svelte', 'GitHub'] as const;
+	const categories = [
+		'All',
+		'Homelab',
+		'OpenAPI',
+		'Plex',
+		'Svelte',
+		'GitHub',
+		'AI',
+		'SDKs',
+		'Tools',
+		'Research'
+	] as const;
 	let active = $state<(typeof categories)[number]>('All');
 
 	const filtered = $derived(
