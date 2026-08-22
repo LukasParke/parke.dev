@@ -56,7 +56,7 @@ const authorEntry = (await getEntry("authors", author || "luke-parke"))!.data;
           </div>
           <!-- Author -->
           <div class="space-y-2">
-            <p class="text-xs">Authors</p>
+            <p class="eyebrow">Authors</p>
             <div class="grid grid-cols-1">
               <p class="text-2xl font-bold">
                 <div class="flex items-center gap-2">
@@ -77,7 +77,7 @@ const authorEntry = (await getEntry("authors", author || "luke-parke"))!.data;
           </div>
           <!-- Published -->
           <div class="space-y-2">
-            <p class="text-xs">Published</p>
+            <p class="eyebrow">Published</p>
             <time class="text-2xl font-bold">
               <FormattedDate date={pubDate} />
               {
@@ -91,7 +91,7 @@ const authorEntry = (await getEntry("authors", author || "luke-parke"))!.data;
           </div>
           <!-- Reading Time -->
           <div class="space-y-2">
-            <p class="text-xs">Reading Time</p>
+            <p class="eyebrow">Reading Time</p>
             <p class="text-2xl font-bold">
               {readingTime()}
             </p>
@@ -103,7 +103,7 @@ const authorEntry = (await getEntry("authors", author || "luke-parke"))!.data;
     <!-- Hero Banner -->
     {
       heroImage && (
-        <section class="preset-filled-surface-950-50 p-5 md:p-10">
+        <section class="border-b border-surface-800 bg-surface-900/40 p-5 md:p-10">
           <div class="container mx-auto flex justify-center items-center">
             {/* Replace `w-ull` with `max-w-full` if you prefer smaller images */}
             <img

@@ -121,11 +121,11 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-family: monospace;
-    /* font-size: clamp(2rem, 6vw, 4rem); */
+    /* the animated word is the one gold element — brand rule */
+    font-family: var(--font-mono-brand);
+    color: var(--color-secondary-400);
+    text-shadow: 0 0 24px rgba(255, 197, 61, 0.25);
     gap: 0.08em; /* spacing between letters */
-    /* optional: make it obvious this is fixed width */
-    /* border: 1px dashed red; */
   }
 
   .slot {

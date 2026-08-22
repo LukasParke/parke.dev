@@ -31,16 +31,15 @@ const socialLinksWithIcons = socialLinks.map((link) => ({
 
 <LayoutRoot title="" description="" author="" pubDate={new Date()}>
   <div>
-    <!-- DEBUG -->
-    <!-- <pre class="pre">{JSON.stringify(posts, null, 2)}</pre> -->
-
     <!-- Header -->
-    <header class="flex justify-center items-center px-4 py-5 md:py-10">
+    <header class="flex flex-col items-center gap-6 px-4 py-8 md:py-12">
+      <p class="eyebrow">
+        <span class="led led-gold mr-2" aria-hidden="true"></span>
+        luke@parke:~/blog
+      </p>
       <!-- Responsive Title -->
-      <!-- NOTE: you may need to adjust the font-size based on the number of characters -->
-      <!-- https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text -->
       <div
-        class="flex flex-col gap-6 text-4xl sm:text-6xl xl:text-8xl 2xl:text-9xl justify-center uppercase font-mono font-bold"
+        class="flex flex-col gap-6 text-4xl sm:text-6xl xl:text-8xl 2xl:text-9xl justify-center uppercase font-mono-brand font-bold"
       >
         <p class="text-center">A Blog about</p>
         <Scroller client:load />
@@ -54,7 +53,7 @@ const socialLinksWithIcons = socialLinks.map((link) => ({
       <div class="container mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4">
         <!-- The Top Post -->
         <a
-          class="card border border-surface-100-900 hover:preset-tonal overflow-hidden"
+          class="card border border-surface-800 hover:preset-tonal-primary overflow-hidden"
           href={`/posts/${posts[0].id}/`}
         >
           {
@@ -62,12 +61,12 @@ const socialLinksWithIcons = socialLinks.map((link) => ({
               <img
                 class="w-full aspect-video rounded-container"
                 src={posts[0].data.heroImage}
-                alt="Portfolio"
+                alt={posts[0].data.title}
               />
             )
           }
           <article class="p-4 space-y-4">
-            <time class="text-xs opacity-75">
+            <time class="font-mono-brand text-xs opacity-75">
               <FormattedDate date={posts[0].data.pubDate} />
             </time>
             <h2 class="h2">{posts[0].data.title}</h2>
@@ -80,7 +79,7 @@ const socialLinksWithIcons = socialLinks.map((link) => ({
           {
             posts.slice(1, 4).map((post) => (
               <a
-                class="card border border-surface-100-900 hover:preset-tonal overflow-hidden"
+                class="card border border-surface-800 hover:preset-tonal-primary overflow-hidden"
                 href={`/posts/${post.id}/`}
               >
                 <article
@@ -90,15 +89,15 @@ const socialLinksWithIcons = socialLinks.map((link) => ({
                     <img
                       class="w-full aspect-video"
                       src={post.data.heroImage}
-                      alt="Portfolio"
+                      alt={post.data.title}
                     />
                   )}
                   <div class="space-y-2 p-4">
-                    <time class="text-xs opacity-75">
+                    <time class="font-mono-brand text-xs opacity-75">
                       <FormattedDate date={post.data.pubDate} />
                     </time>
                     <h2 class="h2">{post.data.title}</h2>
-                    <p class="opacity-75">{posts[0].data.description}</p>
+                    <p class="opacity-75">{post.data.description}</p>
                   </div>
                 </article>
               </a>
@@ -109,29 +108,29 @@ const socialLinksWithIcons = socialLinks.map((link) => ({
     </section>
 
     <!-- Latest -->
-    <section class="preset-filled-surface-950-50 p-5 md:p-10">
+    <section class="border-y border-surface-800 bg-surface-900/40 p-5 md:p-10">
       <div class="container mx-auto space-y-4 md:space-y-10">
         <h2 class="h3">Latest Posts</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {
             posts.slice(1, 5).map((post) => (
               <a
-                class="card border border-surface-900-100 hover:bg-surface-900-100 overflow-hidden"
+                class="card border border-surface-800 hover:bg-surface-900 overflow-hidden"
                 href={`/posts/${post.id}/`}
               >
                 {post.data.heroImage && (
                   <img
                     class="w-full aspect-video"
                     src={post.data.heroImage}
-                    alt="Portfolio"
+                    alt={post.data.title}
                   />
                 )}
                 <article class="p-4 space-y-2">
-                  <time class="block text-base">
+                  <time class="block font-mono-brand text-sm opacity-75">
                     <FormattedDate date={post.data.pubDate} />
                   </time>
                   <h3 class="h3">{post.data.title}</h3>
-                  <p class="opacity-75">{posts[0].data.description}</p>
+                  <p class="opacity-75">{post.data.description}</p>
                 </article>
               </a>
             ))
@@ -141,7 +140,7 @@ const socialLinksWithIcons = socialLinks.map((link) => ({
     </section>
 
     <!-- Authors / Categories -->
-    <section class="preset-filled-primary-500 p-5 md:p-10">
+    <section class="border-y border-surface-800 bg-surface-900/60 p-5 md:p-10">
       <div class="container mx-auto">
         <div
           class="grid grid-cols-1 lg:grid-cols-[1fr_2fr] items-center gap-10 lg:gap-20"
@@ -164,7 +163,7 @@ const socialLinksWithIcons = socialLinks.map((link) => ({
               </ul>
               <br />
               <p>Feel free to follow me on your platform of choice:</p>
-              <div class="flex items-center gap-2 divide-x divide-black">
+              <div class="flex items-center gap-2 divide-x divide-surface-700">
                 {
                   socialLinksWithIcons.map(({ Icon, ...link }) => (
                     <a
@@ -173,7 +172,7 @@ const socialLinksWithIcons = socialLinks.map((link) => ({
                       target={link.target}
                       rel="noreferrer"
                     >
-                      {Icon && <Icon class="size-6 fill-white" />}
+                      {Icon && <Icon class="size-6 fill-current" />}
                       {link.title}
                     </a>
                   ))
