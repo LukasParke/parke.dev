@@ -1,0 +1,75 @@
+---
+title: "Reverse-engineering the Elgato Wave:3 so Linux users don't need a Windows VM"
+description: "How I mapped Elgato's proprietary USB control protocol and built a native Linux D-Bus daemon, CLI, and applet for the Wave:3"
+topic: "Reverse Engineering"
+tags: ["Linux", "USB", "ReverseEngineering", "Audio", "C"]
+author: "luke-parke"
+pubDate: "Aug 21 2026"
+---
+
+The Elgato Wave:3 is a great condenser microphone trapped behind an annoying decision: every hardware control — mute, gain, headphone volume, the mixer — lives in Wave Link, which is Windows and macOS only. On Linux the mic *plays audio fine*, because underneath it all it's a standard USB Audio Class device. Everything else is locked behind Elgato's own software.
+
+I don't keep a Windows VM around for my microphone. So I took the thing apart at the protocol level instead. The result is [wave3-research](https://github.com/LukasParke/wave3-research): complete protocol documentation plus a working native Linux daemon, CLI, and GUI applet.
+
+## The mic is two devices wearing one trench coat
+
+Plug the Wave:3 in and `lsusb` shows `0fd9:0070`. It exposes five USB interfaces:
+
+| Interface | Class | Purpose |
+|-----------|-------|---------|
+| 0 | Audio Control | Standard UAC controls |
+| 1 | Audio Streaming | Mic capture, 24-bit 48 kHz |
+| 2 | Audio Streaming | Headphone playback |
+| **3** | **Vendor (`0xFF`)** | **The interesting one** |
+| 4 | Application/DFU | Firmware updates |
+
+Interface 3 is where Wave Link does its real work. It's not HID, it's not standard UAC — it's a proprietary control-transfer protocol carried entirely on endpoint 0. And here's the detail that made the whole project click: **interface 3 has zero endpoints**. All vendor traffic rides control transfers, which means you can watch it without ever claiming an alternate setting.
+
+## The trick that unlocked everything
+
+The kernel's `snd-usb-audio` driver claims interface 0, so naive `libusb` calls to the UAC feature units fail with `LIBUSB_ERROR_BUSY`. Detaching the kernel driver mid-call works but is rude and fragile.
+
+The workaround I found: standard UAC `GET_CUR`/`SET_CUR` requests succeed when you point the low byte of `wIndex` at interface 3 instead of interface 0, keeping the UAC entity ID in the high byte:
+
+```c
+bmRequestType = 0xA1 /* GET */  // 0x21 for SET
+bRequest      = 0x81 GET_CUR   // 0x01 SET_CUR, 0x82..84 GET_MIN/MAX/RES
+wValue        = (selector << 8) | channel
+wIndex        = (entity << 8) | 3   // 3 = vendor interface workaround
+```
+
+With that, userspace gets full read/write access to both feature units — entity 5 (headphones) and entity 6 (microphone) — while the kernel driver stays exactly where it is. Headphone volume sweeps -60 dB to unity, mutes flip instantly, the LED ring follows along. The physical gain dial reports its position (0–40 dB) but refuses writes over UAC; that's Wave Link's little secret, documented as read-only.
+
+## Mapping the vendor protocol
+
+For the proprietary side I combined two sources: live observation of traffic on hardware I physically own, and static analysis of publicly distributed Wave Link installer packages — string tables and backend names like `VendorUSBLewittDeviceBackend` pointed at the class-config block layout. No firmware was extracted, no binaries redistributed; the repo ships research notes and my own implementation only.
+
+What came out is a fully decoded config protocol covering every hardware-controllable feature on the first-gen Wave:3. Only reserved bytes remain unmapped.
+
+## What actually shipped
+
+Documentation is nice; a daemon you forget about is better. `native-linux/src/wave3-daemon.c` polls the device at 10 Hz and exposes everything as `org.wave3.Daemon` on the session bus:
+
+```bash
+cd native-linux && ./install.sh
+sudo cp udev/50-elgato-wave3.rules /etc/udev/rules.d/
+systemctl --user enable --now wave3-daemon
+
+wave3ctl status
+wave3ctl mute toggle
+wave3ctl volume 75
+```
+
+Three frontends, one bus:
+
+- **`wave3ctl`** — shell CLI for scripts and keybinds
+- **GTK4 applet** — for when you want to click things
+- **D-Bus API** — so Home Assistant, OBS overlays, or whatever you build can subscribe to `StateChanged` signals instead of polling USB
+
+Integration tests cover the whole stack. One known rough edge: PipeWire doesn't surface the headphone playback PCM as a sink automatically, so a small WirePlumber script creates a `wave3-sink` node. Documented in the repo.
+
+## Why publish it
+
+Interoperability research on hardware you own is legitimate engineering, and it's how ecosystems grow beyond their official drivers. If you're staring at a gadget that "just needs their app," open Wireshark on the USB bus before you open your wallet for a supported replacement. The protocol is usually smaller than it looks — this entire mystery reduced to five interfaces, two entities, and one `wIndex` byte.
+
+Repo: [github.com/LukasParke/wave3-research](https://github.com/LukasParke/wave3-research)
