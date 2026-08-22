@@ -1,0 +1,67 @@
+---
+title: "My GitHub stats are rendered by CI into GIFs, because why not"
+description: "A GraphQL collector, a Zod-validated Remotion pipeline, and a profile README that animates itself — the full story of my stats pipeline"
+topic: "Development"
+tags: ["GitHub", "Actions", "Remotion", "Automation", "TypeScript"]
+author: "luke-parke"
+pubDate: "Aug 21 2026"
+---
+
+My GitHub profile README has an animated card on it: contribution streaks, language breakdowns, repo impact — rendered as video frames and published as WebP with a GIF fallback. It updates itself every night. No service runs anywhere for this; it's just Actions, a JSON file, and [Remotion](https://remotion.dev).
+
+The whole thing started as a simple question — *what does my year actually look like?* — and turned into a three-part pipeline I now maintain as a proper monorepo: [diffler](https://github.com/LukasParke/diffler). Here's how it fits together.
+
+## Part one: collecting stats that don't lie
+
+[stats-action](https://github.com/LukasParke/stats-action) is a GitHub Action that walks your profile via the GraphQL API: the full contribution calendar, monthly/yearly rollups, streaks, peak days, plus repo metadata across owned, org-affiliated, and contributed repositories.
+
+The interesting problems were all about being polite to the API:
+
+- **Bounded concurrency** on GraphQL and REST separately, so a big profile doesn't blow through rate limits
+- **A stable cache that gets committed** alongside the output, plus a volatile cache (API metadata) that stays gitignored — historical data is fetched once and never again
+- **Resumable backfill**: `backfill-mode: resume` with a runtime budget (`max-runtime-seconds`), so the first run can take multiple nights instead of dying at hour five
+
+```yaml
+- uses: LukasParke/stats-action@main
+  with:
+    output-path: github-user-stats.json
+    backfill-mode: resume
+    max-runtime-seconds: "480"
+```
+
+One design rule I refuse to bend: **public-safe defaults**. Private repo names never make it into committed output or cache. The renderer double-checks this too — it refuses to publish public assets if the input JSON contains private repository details unless you set an env var to explicitly allow it. Trust, but verify, in both directions.
+
+## Part two: one schema to bind them
+
+Everything downstream consumes a versioned `v2` JSON contract defined once, in TypeScript + Zod, in `@lukasparke/diffler-schemas`. The collector writes it, the renderer validates against the same types, and legacy inputs get normalized instead of crashing. Multi-profile outputs merge through one shared function.
+
+This is the boring part of the project and the reason it survives refactors. When I changed the streak calculation last month, the schema diff told me exactly which two consumers needed updating.
+
+## Part three: rendering video from JSON
+
+The renderer is Remotion — React components composed frame-by-frame and rendered headlessly. Cards exist for main stats, languages, top repos, activity overview, commit streaks, code metrics:
+
+```tsx
+<picture>
+  <source
+    srcset="https://lukasparke.github.io/github-stats-remotion/readme.webp"
+    type="image/webp"
+  />
+  <img
+    src="https://lukasparke.github.io/github-stats-remotion/readme.gif"
+    alt="LukasParke GitHub stats"
+  />
+</picture>
+```
+
+WebP first because it's dramatically smaller than GIF; the GIF fallback is for the places that still won't touch animated WebP.
+
+The publishing detail I'm proudest of: **rendered assets go to GitHub Pages, not back into the repo**. Early versions committed fresh GIFs to `main`, and the history ballooned with binary churn. Now the source repo stays lean forever and Pages serves whatever the nightly render produced.
+
+## Why not use one of the existing stat cards?
+
+I did, for years. Then I wanted data they didn't expose, colors that matched my actual brand, and animations timed the way I like — and by the time you've forked someone else's card that far, you've built your own, minus the schema discipline.
+
+It's also just a great weekend-project shape: an API integration, a data contract, a rendering engine, and CI plumbing — each part small, each part testable, each part useful alone. The monorepo layout reflects that: `packages/diffler` (CLI + action), `packages/remotion` (renderer), `packages/schemas` (the contract). Versions move in lockstep; a tag publishes all three.
+
+Repos: [stats-action](https://github.com/LukasParke/stats-action) · [github-stats-remotion](https://github.com/LukasParke/github-stats-remotion) · [diffler](https://github.com/LukasParke/diffler)

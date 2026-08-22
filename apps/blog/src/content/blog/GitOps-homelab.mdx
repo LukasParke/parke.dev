@@ -1,0 +1,73 @@
+---
+title: "git decides what's live in my closet"
+description: "A tour of the GitOps pipeline that ships this very website: commit to OCI image to Flux reconciling bare-metal Talos in my homelab"
+topic: "Homelab"
+tags: ["Kubernetes", "GitOps", "Flux", "Talos", "Homelab"]
+author: "luke-parke"
+pubDate: "Aug 21 2026"
+---
+
+This site runs on hardware in a closet in Austin, TX. When I merge a PR, the new version is live without me touching a server. Not because I'm fast — because I removed myself from the critical path years ago. The repo is [home-ops](https://github.com/LukasParke/home-ops), and this is how a commit becomes a website.
+
+## The shape of it
+
+The cluster is [Talos Linux](https://github.com/siderolabs/talos) — an immutable, API-driven OS that is Kubernetes and nothing else. There's no SSH into nodes, no snowflake configs. Everything the cluster is lives in git, and [Flux](https://github.com/fluxcd.io) reconciles it. The full stack:
+
+- **Cilium** for networking, **Envoy Gateway** for ingress
+- **cert-manager** for certificates, **external-dns** + **cloudflared** for the outside world
+- **sops** for secrets, **Spegel** so nodes don't re-pull the same images forever
+- **Renovate** opening PRs against my dependencies like an intern who never sleeps
+
+The repo is also a [template](https://github.com/LukasParke/home-ops) — honest credit to [onedr0p's home-ops](https://github.com/onedr0p/home-ops), which inspired it. Cluster layout is declared in `cluster.yaml` and `nodes.yaml`, and [makejinja](https://github.com/mirkolenz/makejinja) renders the Talos and Flux configs from those. Change a YAML file, re-render, push. The cluster follows.
+
+## Shipping a website, end to end
+
+parke.dev is a Bun monorepo — the portfolio in SvelteKit, this blog in Astro. The pipeline has exactly four hops:
+
+1. **Merge to main.** GitHub Actions builds each app into an OCI image and pushes it to the registry.
+2. **Flux notices the new image.** An `ImageRepository` watches the registry; an `ImagePolicy` picks the newest semver and writes it back into the cluster manifests — in git, as a commit.
+3. **Flux reconciles.** The new rollout lands on the cluster: new pods, readiness gates, old pods drained.
+4. **The automation commit is the audit log.** If you want to know what's live and when, `git log` is the answer.
+
+The manifest side is deliberately boring:
+
+```yaml
+apiVersion: image.toolkit.fluxcd.io/v1beta2
+kind: ImagePolicy
+metadata:
+  name: portfolio
+spec:
+  imageRepositoryRef:
+    name: portfolio
+  policy:
+    semver:
+      range: ">=1.0.0"
+```
+
+Nobody deploys. Nobody SSHes. The worst thing an engineer can do here is `kubectl apply` by hand, and the best part of that rule is there's nothing to argue about — the cluster will just revert the drift on its next reconcile.
+
+## Rollbacks are `git revert`
+
+Because every rollout is a commit, rolling back is the most boring operation in computing:
+
+```bash
+git revert <the-image-bump-commit>
+```
+
+Flux reconciles the old digest, and the site walks backwards in time. I have used this exactly when you'd expect — right after a "small CSS change" that wasn't. The failure mode where a deploy goes out and *nobody remembers what changed* simply doesn't exist here. The answer is always in the log, because the log is load-bearing.
+
+## The parts that make it livable
+
+Three things keep this from becoming a part-time job:
+
+- **Renovate** bumps everything — Flux, Cilium, cert-manager, app images — one PR at a time, and CI runs [flux-local](https://github.com/allenporter/flux-local) diffs on every PR so I can see HelmRelease changes before they merge.
+- **Sops** keeps secrets in the same repo as everything else, encrypted against the cluster's age key. No vault service to babysit.
+- **Spegel** mirrors images peer-to-peer across nodes, so a rebuild doesn't mean re-downloading the same 400 MB five times.
+
+## Is this overkill for two websites?
+
+Absolutely. That's not the point. The point is that everything I learn about running this cluster transfers directly to running production infrastructure, and everything that breaks breaks in a closet I control instead of a pager I don't.
+
+The sites are the demo. The pipeline is the product.
+
+Repo: [github.com/LukasParke/home-ops](https://github.com/LukasParke/home-ops)

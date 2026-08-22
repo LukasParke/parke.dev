@@ -1,0 +1,68 @@
+---
+title: "My TV obeys MQTT now"
+description: "Building capi — a Rust service wrapping libcec behind REST, WebSocket, and MQTT so Home Assistant can run the living room"
+topic: "Homelab"
+tags: ["Rust", "HDMI-CEC", "MQTT", "HomeAssistant", "RaspberryPi"]
+author: "luke-parke"
+pubDate: "Aug 21 2026"
+---
+
+Every HDMI device made in the last fifteen years speaks CEC — that little protocol that lets your receiver turn on the TV and your console switch inputs. It's also, famously, cursed. Implementations disagree with each other, TVs drop off the bus for fun, and the consumer adapters you can buy mostly come with Windows-era tooling.
+
+I wanted my living room in Home Assistant like everything else. What I didn't want was another pile of shell scripts exec'd from an automation. So I built [capi](https://github.com/LukasParke/capi): a Rust service that puts a proper API in front of CEC and speaks fluent smart-home on the side.
+
+## What it does
+
+capi runs on a Raspberry Pi (or any ARM SBC) with a USB CEC adapter and wraps [libcec](https://github.com/Pulse-Eight/libcec) with full FFI bindings. On top of that:
+
+- **REST API** for power, volume, source/HDMI switching, navigation keys — and raw CEC passthrough plus a dev console for when you're debugging the cursed parts
+- **MQTT bridge** with a retained availability topic and LWT
+- **Server-Sent Events + WebSocket** streams of live CEC bus traffic
+- **Web dashboard** with a remote control and one-click update
+- **Optional bearer-token auth** with CSRF/same-origin defenses, because your TV remote shouldn't be an open relay
+
+The MQTT part is what makes Home Assistant sing. A `binary_sensor` on the availability topic knows when the Pi dies; switches map to power/volume/source topics:
+
+```yaml
+# Home Assistant
+mqtt:
+  switch:
+    - name: "Living room TV"
+      state_topic: "capi/tv/power/state"
+      command_topic: "capi/tv/power/set"
+      availability_topic: "capi/availability"
+      payload_on: "on"
+      payload_off: "off"
+```
+
+And from anything that can speak HTTP:
+
+```bash
+curl -X POST http://capi.local:8080/api/tv/power \
+  -H "Authorization: Bearer $CAPI_TOKEN" \
+  -d '{"state": "on"}'
+```
+
+## The FFI discipline nobody warns you about
+
+libcec is a C library, which means lifetime management is your problem now. The classic failure is calling into the library after its callback context has been torn down — a crash window that opens exactly once every fifty remotes presses, at a party.
+
+capi enforces a drain-before-destroy discipline at the FFI boundary: no binding is released while callbacks can still fire, and the pure-Rust side never holds a pointer across an await. It's the kind of thing that's invisible until it isn't.
+
+## The installer is half the project
+
+Shipping to a Pi means shipping to *other people's* Pis, which means install scripts that assume nothing:
+
+```bash
+VERSION=v2.0.0
+curl -sSL "https://raw.githubusercontent.com/LukasParke/capi/${VERSION}/install.sh" \
+  | sudo VERSION=${VERSION} bash
+```
+
+That one-liner detects the architecture (`arm64`/`armv6`) *and* the installed libcec ABI — `libcec6` on Bookworm, `libcec7` on Trixie — then downloads the matching release binary. It refuses to run unless the release ships `SHA256SUMS` and verifies every artifact against it. Updates are health-gated: ten seconds of polling `/api/health`, and if the new binary never gets healthy, the previous binary comes back and the service restarts automatically. The web dashboard has an update button too, because climbing behind the TV is the worst part of AV gear.
+
+## Why not just buy a smarter hub
+
+Because the point of the homelab is that when something breaks, I get to learn *why* instead of filing a ticket into a void. CEC over MQTT took a weekend of swearing at bus dumps and now every light, speaker, and screen in that room agrees on who's awake.
+
+Repo: [github.com/LukasParke/capi](https://github.com/LukasParke/capi)
