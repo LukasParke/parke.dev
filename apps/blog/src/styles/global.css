@@ -1,16 +1,93 @@
+/* Fonts — the parke.dev brand stack */
+@import "@fontsource/inter";
+@import "@fontsource/space-grotesk";
+@import "@fontsource/jetbrains-mono";
+
+/* Tailwind + Skeleton */
 @import "tailwindcss";
 @plugin '@tailwindcss/forms';
 
 @import "@skeletonlabs/skeleton";
-@import "@skeletonlabs/skeleton/themes/cerberus";
+
+/* The shared parke.dev theme — "Server Room at Night"
+   (same file the portfolio runs; registered via data-theme="parke") */
+@import "./parke.css";
 
 @import '@skeletonlabs/skeleton-svelte';
 
-/* Theme Overrides --- */
+/* Dark mode only — this site lives its life in the rack aisle. */
+html {
+  color-scheme: dark;
+}
 
-[data-theme="cerberus"] {
-  --text-scaling: 1;
-  --radius-base: 0.25rem;
-  --radius-container: 0.25rem;
-  --color-surface-950: oklch(0% 0 none);
+/* Brand extras --------------------------------------------------------- */
+:root {
+  --font-mono-brand: "JetBrains Mono", ui-monospace, monospace;
+  --glow-gold: 0 0 12px rgba(255, 197, 61, 0.35);
+  --glow-blue: 0 0 16px rgba(61, 139, 255, 0.3);
+}
+
+/* Subtle dot-grid texture on the void */
+body {
+  background-image: radial-gradient(
+    rgba(61, 139, 255, 0.04) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+}
+
+.font-mono-brand {
+  font-family: var(--font-mono-brand);
+}
+
+.glow-gold {
+  box-shadow: var(--glow-gold);
+}
+
+/* Rules read as rack seams, not white flashes */
+.hr {
+  border-color: var(--color-surface-700);
+}
+
+/* Post links: Uplink Blue with gold underline on hover */
+article a:not([class]) {
+  color: var(--color-primary-400);
+  text-decoration-line: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: transparent;
+  transition: text-decoration-color 150ms;
+}
+article a:not([class]):hover {
+  text-decoration-color: var(--color-secondary-400);
+}
+
+.glow-blue {
+  box-shadow: var(--glow-blue);
+}
+
+/* Mono eyebrow labels — `$ ls ~/projects` energy */
+.eyebrow {
+  font-family: var(--font-mono-brand);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-surface-300);
+}
+
+/* LED status dots */
+.led {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+}
+.led-online {
+  background: var(--color-tertiary-400);
+  box-shadow:
+    0 0 10px color-mix(in oklab, var(--color-tertiary-400) 40%, transparent);
+}
+.led-gold {
+  background: var(--color-secondary-400);
+  box-shadow: var(--glow-gold);
 }

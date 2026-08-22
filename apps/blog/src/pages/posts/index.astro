@@ -12,7 +12,11 @@ const posts = (await getCollection("blog")).sort(
 <LayoutRoot title="" description="" author="luke-parke" pubDate={new Date()}>
   <div>
     <!-- Header -->
-    <header class="flex justify-center items-center px-4 py-5 md:py-10">
+    <header class="flex flex-col items-center px-4 pt-8 md:pt-10">
+      <p class="eyebrow">
+        <span class="led led-gold mr-2" aria-hidden="true"></span>
+        luke@parke:~/blog/posts
+      </p>
       <!-- https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text -->
       <svg
         class="container mx-auto w-full"
@@ -25,7 +29,7 @@ const posts = (await getCollection("blog")).sort(
           y="50%"
           dominant-baseline="central"
           text-anchor="middle"
-          class="fill-surface-950-50 uppercase font-bold"
+          class="fill-surface-100 uppercase font-bold"
         >
           ALL POSTS
         </text>
@@ -42,7 +46,7 @@ const posts = (await getCollection("blog")).sort(
         posts.map((post) => (
           <a
             href={`/posts/${post.id}/`}
-            class="card border border-surface-100-900 hover:preset-tonal overflow-hidden"
+            class="card border border-surface-800 hover:preset-tonal-primary overflow-hidden"
           >
             {post.data.heroImage && (
               <img
@@ -55,7 +59,7 @@ const posts = (await getCollection("blog")).sort(
             )}
             <article class="grid grid-cols-1 gap-4 p-4">
               <div class="space-y-4">
-                <p class="text-xs opacity-75">
+                <p class="font-mono-brand text-xs opacity-75">
                   <FormattedDate date={post.data.pubDate} />
                 </p>
                 <h2 class="h2">{post.data.title}</h2>
